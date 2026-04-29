@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillSwap — Peer Skill Exchange</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sand:     #dff9a5;
+  --sand2:    #f0f8d6;
+  --sand3:    #b8f0d9;
+  --cream:    #f4fdf5;
+  --brown1:   #5e72008b;
+  --brown2:   #2be475;
+  --brown3:   #21f39c;
+  --brown4:   #64f69f;
+  --brown5:   #bbfbce;
+  --dark:     #0a1929;
+  --dark2:    #0d2137;
+  --white:    #ffffff;
+  --border:   rgba(21, 192, 49, 0.13);
+  --border2:  rgba(21, 192, 35, 0.22);
+  --shadow:   0 4px 24px rgba(10,25,41,0.08);
+  --shadow2:  0 8px 40px rgba(10,25,41,0.14);
+  --text:     #0a1929;
+  --text2:    #1565c0;
+  --text3:    rgba(10,25,41,0.45);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--cream);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+/* ─── AUTH PAGES ─── */
+.auth-page{
+  display:none;
+  min-height:100vh;
+  background:var(--sand);
+  align-items:center;
+  justify-content:center;
+  padding:2rem;
+  position:relative;
+  overflow:hidden;
+}
+.auth-page.active{display:flex;}
+.auth-bg-text{
+  position:absolute;
+  font-family:'Playfair Display',serif;
+  font-size:28vw;
+  font-weight:700;
+  color:rgba(107,76,42,0.04);
+  user-select:none;
+  letter-spacing:-0.05em;
+  z-index:0;
+}
+.auth-box{
+  background:var(--white);
+  border-radius:28px;
+  border:1px solid var(--border2);
+  padding:3rem;
+  width:100%;
+  max-width:460px;
+  box-shadow:var(--shadow2);
+  position:relative;z-index:1;
+}
+.auth-logo{
+  font-family:'Playfair Display',serif;
+  font-size:1.7rem;
+  font-weight:700;
+  color:var(--dark);
+  margin-bottom:0.25rem;
+  letter-spacing:-0.03em;
+}
+.auth-logo span{color:var(--brown2);}
+.auth-sub{font-size:0.82rem;color:var(--text3);margin-bottom:2.5rem;}
+.auth-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.9rem;font-weight:600;
+  margin-bottom:0.5rem;
+  letter-spacing:-0.02em;
+}
+.auth-desc{font-size:0.85rem;color:var(--text3);margin-bottom:2rem;line-height:1.6;}
+.form-field{margin-bottom:1.25rem;}
+.form-field label{
+  display:block;font-size:0.75rem;font-weight:600;
+  letter-spacing:0.06em;text-transform:uppercase;
+  color:var(--brown2);margin-bottom:6px;
+}
+.form-field input,
+.form-field select{
+  width:100%;padding:0.75rem 1rem;
+  border:1.5px solid var(--border2);
+  border-radius:12px;
+  font-family:'Inter',sans-serif;font-size:0.9rem;
+  background:var(--sand);color:var(--text);
+  outline:none;transition:border-color 0.2s,background 0.2s;
+}
+.form-field input:focus,
+.form-field select:focus{
+  border-color:var(--brown2);background:var(--white);
+}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.btn-primary{
+  width:100%;padding:0.85rem;
+  background:var(--brown1);color:var(--white);
+  border:none;border-radius:12px;
+  font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:600;
+  cursor:pointer;transition:background 0.2s,transform 0.15s;
+  letter-spacing:0.01em;
+}
+.btn-primary:hover{background:var(--dark);transform:translateY(-1px);}
+.auth-switch{
+  text-align:center;margin-top:1.5rem;
+  font-size:0.85rem;color:var(--text3);
+}
+.auth-switch a{color:var(--brown2);font-weight:600;cursor:pointer;text-decoration:none;}
+.auth-switch a:hover{color:var(--dark);}
+.auth-divider{
+  display:flex;align-items:center;gap:1rem;
+  margin:1.5rem 0;color:var(--text3);font-size:0.8rem;
+}
+.auth-divider::before,.auth-divider::after{
+  content:'';flex:1;height:1px;background:var(--border2);
+}
+
+/* ─── MAIN APP SHELL ─── */
+.app{
+  display:none;
+  min-height:100vh;
+}
+.app.active{display:flex;flex-direction:column;}
+
+/* TOP NAV */
+.topnav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:60px;
+  background:rgba(244,249,253,0.95);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 1.5rem;
+}
+.nav-brand{
+  font-family:'Playfair Display',serif;
+  font-size:1.2rem;font-weight:700;
+  color:var(--dark);letter-spacing:-0.03em;
+}
+.nav-brand span{color:var(--brown2);}
+.nav-tabs{
+  display:flex;gap:4px;
+  background:var(--sand2);
+  border-radius:100px;padding:4px;
+}
+.nav-tab{
+  padding:6px 18px;border-radius:100px;
+  font-size:0.8rem;font-weight:500;
+  color:var(--text2);cursor:pointer;
+  border:none;background:transparent;
+  transition:all 0.2s;white-space:nowrap;
+}
+.nav-tab.active{
+  background:var(--white);
+  color:var(--dark);
+  box-shadow:0 2px 8px rgba(44,26,14,0.1);
+  font-weight:600;
+}
+.nav-right{display:flex;align-items:center;gap:12px;}
+.credit-badge{
+  display:flex;align-items:center;gap:6px;
+  background:var(--sand2);
+  padding:6px 14px;border-radius:100px;
+  font-size:0.8rem;font-weight:600;color:var(--brown1);
+  border:1px solid var(--border2);
+}
+.credit-badge .coin{
+  width:18px;height:18px;border-radius:50%;
+  background:var(--brown3);display:flex;align-items:center;justify-content:center;
+  font-size:0.6rem;color:var(--white);font-weight:700;
+}
+.nav-avatar{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--brown1),var(--brown3));
+  display:flex;align-items:center;justify-content:center;
+  color:var(--white);font-weight:700;font-size:0.8rem;
+  cursor:pointer;
+}
+
+/* ─── MAIN LAYOUT ─── */
+.main-content{
+  margin-top:60px;
+  display:flex;
+  min-height:calc(100vh - 60px);
+}
+
+/* LEFT SIDEBAR */
+.sidebar-left{
+  width:280px;min-width:280px;
+  background:var(--white);
+  border-right:1px solid var(--border);
+  padding:1.5rem 1rem;
+  position:sticky;top:60px;
+  height:calc(100vh - 60px);
+  overflow-y:auto;
+  display:flex;flex-direction:column;gap:1.5rem;
+}
+.sidebar-section-label{
+  font-size:0.68rem;font-weight:700;
+  letter-spacing:0.12em;text-transform:uppercase;
+  color:var(--text3);padding:0 0.5rem;margin-bottom:0.5rem;
+}
+.chat-item{
+  display:flex;align-items:center;gap:10px;
+  padding:0.65rem 0.75rem;border-radius:12px;
+  cursor:pointer;transition:background 0.15s;
+}
+.chat-item:hover{background:var(--sand);}
+.chat-item.active-chat{background:var(--sand2);}
+.chat-av{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:0.75rem;color:var(--white);
+}
+.chat-info{flex:1;min-width:0;}
+.chat-name{font-size:0.85rem;font-weight:600;color:var(--text);}
+.chat-preview{font-size:0.75rem;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+.chat-badge{
+  background:var(--brown2);color:var(--white);
+  width:18px;height:18px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.65rem;font-weight:700;flex-shrink:0;
+}
+.session-item{
+  background:var(--sand);border-radius:12px;
+  padding:0.75rem;border:1px solid var(--border);
+  cursor:pointer;transition:transform 0.15s;
+}
+.session-item:hover{transform:translateY(-1px);}
+.session-skill{font-size:0.82rem;font-weight:600;color:var(--dark);}
+.session-meta{font-size:0.72rem;color:var(--text3);margin-top:3px;}
+.session-status{
+  display:inline-block;
+  padding:2px 8px;border-radius:100px;font-size:0.68rem;font-weight:600;
+  margin-top:6px;
+}
+.status-live{background:rgba(107,76,42,0.12);color:var(--brown1);}
+.status-soon{background:rgba(201,168,124,0.2);color:var(--brown2);}
+
+/* CENTER */
+.center-panel{
+  flex:1;padding:2rem;
+  display:flex;flex-direction:column;gap:2rem;
+  min-width:0;
+}
+
+/* RIGHT SIDEBAR */
+.sidebar-right{
+  width:300px;min-width:300px;
+  background:var(--white);
+  border-left:1px solid var(--border);
+  padding:1.5rem 1rem;
+  position:sticky;top:60px;
+  height:calc(100vh - 60px);
+  overflow-y:auto;
+}
+
+/* ─── PAGE SECTIONS ─── */
+.page{display:none;}
+.page.active{display:block;}
+
+/* DASHBOARD */
+.greeting{
+  font-family:'Playfair Display',serif;
+  font-size:1.8rem;font-weight:600;
+  letter-spacing:-0.02em;margin-bottom:0.25rem;
+}
+.greeting span{color:var(--brown2);}
+.greeting-sub{font-size:0.88rem;color:var(--text3);}
+
+/* STATS ROW */
+.stats-row{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;
+}
+.stat-card{
+  background:var(--white);border-radius:16px;
+  border:1px solid var(--border);padding:1.25rem;
+  transition:transform 0.2s,box-shadow 0.2s;
+}
+.stat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+.stat-icon{
+  width:38px;height:38px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;margin-bottom:0.75rem;
+}
+.stat-num{
+  font-family:'Playfair Display',serif;
+  font-size:1.8rem;font-weight:700;color:var(--dark);
+  line-height:1;margin-bottom:4px;
+}
+.stat-label{font-size:0.75rem;color:var(--text3);font-weight:500;}
+
+/* STREAK */
+.streak-bar{
+  background:var(--white);border-radius:16px;
+  border:1px solid var(--border);padding:1.25rem 1.5rem;
+  display:flex;align-items:center;gap:1.5rem;
+}
+.streak-fire{font-size:2rem;}
+.streak-info{flex:1;}
+.streak-title{font-weight:600;font-size:0.9rem;color:var(--dark);}
+.streak-desc{font-size:0.78rem;color:var(--text3);margin-top:2px;}
+.streak-days{display:flex;gap:6px;margin-top:10px;}
+.streak-day{
+  width:30px;height:30px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.65rem;font-weight:700;
+  border:1.5px solid var(--border2);
+  color:var(--text3);
+}
+.streak-day.done{
+  background:var(--brown1);border-color:var(--brown1);
+  color:var(--white);
+}
+.streak-day.today{
+  background:var(--sand2);border-color:var(--brown2);
+  color:var(--brown1);
+}
+
+/* BEST MATCH CARD */
+.section-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.1rem;font-weight:600;
+  letter-spacing:-0.01em;margin-bottom:1rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.section-title a{font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:500;color:var(--brown2);text-decoration:none;cursor:pointer;}
+.match-card{
+  background:var(--white);border-radius:20px;
+  border:1px solid var(--border);padding:1.5rem;
+  transition:transform 0.2s,box-shadow 0.2s;cursor:pointer;
+}
+.match-card:hover{transform:translateY(-3px);box-shadow:var(--shadow2);}
+.match-header{display:flex;align-items:center;gap:12px;margin-bottom:1rem;}
+.match-av{
+  width:48px;height:48px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:1rem;color:var(--white);
+  flex-shrink:0;
+}
+.match-name{font-weight:600;font-size:0.95rem;color:var(--dark);}
+.match-branch{font-size:0.75rem;color:var(--text3);margin-top:2px;}
+.match-score-pill{
+  margin-left:auto;
+  background:var(--sand2);
+  padding:4px 12px;border-radius:100px;
+  font-size:0.75rem;font-weight:700;color:var(--brown1);
+  border:1px solid var(--border2);
+}
+.exchange-row{
+  display:flex;align-items:center;gap:10px;
+  background:var(--sand);border-radius:12px;
+  padding:0.75rem 1rem;margin-bottom:1rem;
+}
+.ex-skill{flex:1;}
+.ex-label{font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);margin-bottom:3px;}
+.ex-name{font-size:0.88rem;font-weight:600;color:var(--dark);}
+.ex-level{
+  font-size:0.68rem;padding:2px 8px;border-radius:100px;
+  background:var(--sand3);color:var(--brown2);font-weight:600;margin-top:3px;display:inline-block;
+}
+.ex-arrow{font-size:1.2rem;color:var(--brown4);flex-shrink:0;}
+.match-bars{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem;}
+.bar-row{display:flex;align-items:center;gap:8px;}
+.bar-label{font-size:0.72rem;color:var(--text3);width:110px;flex-shrink:0;}
+.bar-track{flex:1;height:6px;background:var(--sand2);border-radius:100px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:100px;background:var(--brown3);}
+.bar-pct{font-size:0.72rem;color:var(--brown2);font-weight:600;width:32px;text-align:right;}
+.match-actions{display:flex;gap:8px;}
+.btn-request{
+  flex:1;padding:0.65rem;
+  background:var(--brown1);color:var(--white);
+  border:none;border-radius:10px;font-size:0.82rem;font-weight:600;
+  cursor:pointer;transition:background 0.2s;
+}
+.btn-request:hover{background:var(--dark);}
+.btn-save{
+  padding:0.65rem 1rem;
+  background:var(--sand);color:var(--brown2);
+  border:1.5px solid var(--border2);border-radius:10px;
+  font-size:0.82rem;font-weight:600;cursor:pointer;
+  transition:border-color 0.2s;
+}
+.btn-save:hover{border-color:var(--brown2);}
+
+/* MATCHES GRID */
+.matches-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem;
+}
+
+/* FIND MATCHES PAGE */
+.search-bar{
+  display:flex;gap:10px;align-items:center;
+  background:var(--white);border-radius:14px;
+  border:1.5px solid var(--border2);
+  padding:0.75rem 1rem;
+  margin-bottom:1.5rem;
+}
+.search-bar input{
+  flex:1;border:none;background:transparent;
+  font-family:'Inter',sans-serif;font-size:0.9rem;
+  color:var(--text);outline:none;
+}
+.search-bar input::placeholder{color:var(--text3);}
+.search-icon{font-size:1.1rem;opacity:0.5;}
+
+.filter-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.5rem;}
+.fchip{
+  padding:6px 14px;border-radius:100px;
+  font-size:0.78rem;font-weight:500;
+  border:1.5px solid var(--border2);
+  background:transparent;color:var(--text2);
+  cursor:pointer;transition:all 0.2s;
+}
+.fchip.on{background:var(--brown1);color:var(--white);border-color:var(--brown1);}
+.fchip:hover:not(.on){border-color:var(--brown2);color:var(--brown1);}
+
+.skill-tree{
+  background:var(--white);border-radius:16px;
+  border:1px solid var(--border);padding:1.25rem;
+  margin-bottom:1.5rem;
+}
+.tree-title{font-weight:700;font-size:0.85rem;color:var(--dark);margin-bottom:1rem;}
+.tree-domain{margin-bottom:0.75rem;}
+.tree-domain-name{
+  font-size:0.82rem;font-weight:600;color:var(--brown2);
+  display:flex;align-items:center;gap:6px;cursor:pointer;
+  padding:4px 0;
+}
+.tree-domain-name::before{content:'▶';font-size:0.55rem;color:var(--brown4);transition:transform 0.2s;}
+.tree-domain.open .tree-domain-name::before{transform:rotate(90deg);}
+.tree-sub{display:none;padding-left:1.25rem;margin-top:4px;}
+.tree-domain.open .tree-sub{display:block;}
+.tree-leaf{
+  font-size:0.78rem;color:var(--text2);
+  padding:3px 8px;border-radius:6px;cursor:pointer;
+  transition:background 0.15s;display:inline-block;margin:2px 2px;
+  border:1px solid var(--border);
+}
+.tree-leaf:hover{background:var(--sand2);color:var(--brown1);}
+.tree-leaf.sel{background:var(--brown1);color:var(--white);border-color:var(--brown1);}
+
+/* LEADERBOARD */
+.leaderboard-table{
+  background:var(--white);border-radius:16px;
+  border:1px solid var(--border);overflow:hidden;
+}
+.lb-header{
+  display:grid;grid-template-columns:48px 1fr 100px 100px 80px;
+  padding:0.75rem 1.25rem;
+  background:var(--sand2);
+  font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--text3);border-bottom:1px solid var(--border);
+}
+.lb-row{
+  display:grid;grid-template-columns:48px 1fr 100px 100px 80px;
+  padding:0.9rem 1.25rem;
+  border-bottom:1px solid var(--border);
+  align-items:center;transition:background 0.15s;cursor:pointer;
+}
+.lb-row:last-child{border-bottom:none;}
+.lb-row:hover{background:var(--sand);}
+.lb-rank{
+  font-family:'Playfair Display',serif;
+  font-weight:700;font-size:1.1rem;color:var(--brown4);
+}
+.lb-rank.gold{color:#1976d2;}
+.lb-rank.silver{color:#64b5f6;}
+.lb-rank.bronze{color:#0288d1;}
+.lb-user{display:flex;align-items:center;gap:10px;}
+.lb-av{
+  width:34px;height:34px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:0.72rem;color:var(--white);
+}
+.lb-name{font-weight:600;font-size:0.88rem;color:var(--dark);}
+.lb-branch{font-size:0.72rem;color:var(--text3);}
+.lb-stat{font-size:0.85rem;font-weight:600;color:var(--brown2);}
+.stars{color:var(--brown3);font-size:0.75rem;letter-spacing:1px;}
+
+/* SESSIONS PAGE */
+.session-tabs{display:flex;gap:4px;background:var(--sand2);border-radius:100px;padding:4px;width:fit-content;margin-bottom:1.5rem;}
+.stab{
+  padding:6px 20px;border-radius:100px;
+  font-size:0.8rem;font-weight:500;color:var(--text2);
+  cursor:pointer;border:none;background:transparent;transition:all 0.2s;
+}
+.stab.on{background:var(--white);color:var(--dark);font-weight:600;box-shadow:0 2px 8px rgba(44,26,14,0.1);}
+
+.session-card{
+  background:var(--white);border-radius:16px;
+  border:1px solid var(--border);padding:1.25rem 1.5rem;
+  margin-bottom:1rem;display:flex;align-items:center;gap:1.25rem;
+  transition:transform 0.15s;cursor:pointer;
+}
+.session-card:hover{transform:translateY(-2px);}
+.session-date{
+  text-align:center;width:50px;flex-shrink:0;
+  background:var(--sand2);border-radius:12px;padding:8px 6px;
+}
+.session-day{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--dark);line-height:1;}
+.session-mon{font-size:0.65rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);}
+.session-details{flex:1;}
+.session-title2{font-weight:600;font-size:0.95rem;color:var(--dark);margin-bottom:3px;}
+.session-with{font-size:0.78rem;color:var(--text3);}
+.session-time{font-size:0.78rem;color:var(--text3);margin-top:3px;}
+.session-cta{display:flex;gap:8px;flex-shrink:0;}
+.btn-sm{
+  padding:6px 14px;border-radius:8px;font-size:0.78rem;font-weight:600;
+  cursor:pointer;transition:all 0.15s;border:1.5px solid var(--border2);
+  background:transparent;color:var(--brown2);
+}
+.btn-sm.primary{background:var(--brown1);color:var(--white);border-color:var(--brown1);}
+.btn-sm:hover{border-color:var(--brown2);}
+.btn-sm.primary:hover{background:var(--dark);}
+
+/* PROFILE PAGE */
+.profile-hero{
+  background:var(--white);border-radius:20px;
+  border:1px solid var(--border);padding:2rem;
+  margin-bottom:1.5rem;
+  display:flex;align-items:flex-start;gap:1.5rem;
+}
+.profile-av-lg{
+  width:72px;height:72px;border-radius:18px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:1.5rem;color:var(--white);
+  background:linear-gradient(135deg,#1565c0,#2196f3);
+  flex-shrink:0;
+}
+.profile-name{
+  font-family:'Playfair Display',serif;
+  font-size:1.5rem;font-weight:700;
+  letter-spacing:-0.02em;margin-bottom:4px;
+}
+.profile-branch-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--sand2);border:1px solid var(--border2);
+  border-radius:100px;padding:4px 12px;
+  font-size:0.75rem;font-weight:600;color:var(--brown2);margin-bottom:8px;
+}
+.profile-bio{font-size:0.85rem;color:var(--text3);line-height:1.6;}
+.profile-stats{
+  display:flex;gap:1.5rem;margin-top:1rem;
+  padding-top:1rem;border-top:1px solid var(--border);
+}
+.ps{text-align:center;}
+.ps-num{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--dark);line-height:1;}
+.ps-label{font-size:0.7rem;color:var(--text3);margin-top:2px;}
+.edit-btn{
+  margin-left:auto;padding:8px 18px;border-radius:10px;
+  background:var(--sand);color:var(--brown2);
+  border:1.5px solid var(--border2);font-size:0.82rem;font-weight:600;
+  cursor:pointer;height:fit-content;
+}
+
+.skill-section{
+  background:var(--white);border-radius:16px;
+  border:1px solid var(--border);padding:1.5rem;margin-bottom:1rem;
+}
+.skill-section-title{
+  font-weight:700;font-size:0.85rem;color:var(--dark);
+  margin-bottom:1rem;display:flex;align-items:center;gap:8px;
+}
+.skill-pills{display:flex;flex-wrap:wrap;gap:8px;}
+.skill-pill{
+  padding:6px 14px;border-radius:100px;
+  font-size:0.78rem;font-weight:500;
+  border:1.5px solid var(--border2);
+  background:var(--sand);color:var(--brown2);
+  display:flex;align-items:center;gap:6px;
+}
+.pill-level{
+  background:var(--brown2);color:var(--white);
+  padding:1px 6px;border-radius:100px;font-size:0.6rem;font-weight:700;
+}
+.add-skill-btn{
+  padding:6px 14px;border-radius:100px;
+  font-size:0.78rem;font-weight:600;
+  border:1.5px dashed var(--border2);
+  background:transparent;color:var(--text3);cursor:pointer;
+  transition:all 0.2s;
+}
+.add-skill-btn:hover{border-color:var(--brown2);color:var(--brown2);}
+
+/* RIGHT SIDEBAR CONTENT */
+.profile-mini{
+  background:var(--sand);border-radius:16px;
+  padding:1.25rem;margin-bottom:1.25rem;
+  text-align:center;
+}
+.profile-mini-av{
+  width:52px;height:52px;border-radius:14px;
+  background:linear-gradient(135deg,#1565c0,#2196f3);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:1.1rem;color:var(--white);
+  margin:0 auto 0.75rem;
+}
+.profile-mini-name{font-weight:700;font-size:0.95rem;margin-bottom:2px;}
+.profile-mini-branch{font-size:0.75rem;color:var(--text3);}
+.credits-display{
+  background:var(--brown1);border-radius:12px;
+  padding:1rem;margin-top:1rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.credits-num{
+  font-family:'Playfair Display',serif;
+  font-size:1.8rem;font-weight:700;color:var(--white);line-height:1;
+}
+.credits-label{font-size:0.72rem;color:rgba(255,254,251,0.6);margin-top:2px;}
+.credits-icon{font-size:1.8rem;}
+
+.quick-actions{margin-bottom:1.25rem;}
+.qa-title{font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text3);margin-bottom:0.75rem;}
+.qa-btn{
+  width:100%;padding:0.7rem 1rem;
+  border-radius:10px;border:1.5px solid var(--border2);
+  background:var(--white);color:var(--dark);
+  font-size:0.82rem;font-weight:600;
+  cursor:pointer;text-align:left;
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:6px;transition:background 0.15s;
+}
+.qa-btn:hover{background:var(--sand);}
+
+.top-mentors-mini{background:var(--white);border-radius:14px;border:1px solid var(--border);overflow:hidden;}
+.tm-title{padding:0.75rem 1rem;font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);}
+.tm-row{
+  display:flex;align-items:center;gap:10px;
+  padding:0.65rem 1rem;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background 0.15s;
+}
+.tm-row:last-child{border-bottom:none;}
+.tm-row:hover{background:var(--sand);}
+.tm-av{
+  width:30px;height:30px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:0.65rem;color:var(--white);flex-shrink:0;
+}
+.tm-info{flex:1;}
+.tm-name{font-size:0.8rem;font-weight:600;color:var(--dark);}
+.tm-skill{font-size:0.68rem;color:var(--text3);}
+.tm-rating{font-size:0.75rem;color:var(--brown3);font-weight:600;}
+
+/* BOTTOM INPUT BAR */
+.bottom-bar{
+  position:fixed;bottom:0;left:280px;right:300px;z-index:150;
+  background:rgba(244,249,253,0.97);
+  backdrop-filter:blur(14px);
+  border-top:1px solid var(--border);
+  padding:0.75rem 2rem;
+  display:flex;align-items:center;gap:10px;
+}
+.bottom-input{
+  flex:1;padding:0.7rem 1.1rem;
+  background:var(--white);
+  border:1.5px solid var(--border2);
+  border-radius:100px;
+  font-family:'Inter',sans-serif;font-size:0.88rem;
+  color:var(--text);outline:none;
+  transition:border-color 0.2s;
+}
+.bottom-input:focus{border-color:var(--brown2);}
+.bottom-input::placeholder{color:var(--text3);}
+.bottom-icon-btn{
+  width:40px;height:40px;border-radius:50%;
+  border:1.5px solid var(--border2);background:var(--white);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;cursor:pointer;transition:background 0.15s;flex-shrink:0;
+}
+.bottom-icon-btn:hover{background:var(--sand2);}
+.bottom-send{
+  padding:0 1.25rem;height:40px;border-radius:100px;
+  background:var(--brown1);color:var(--white);
+  border:none;font-size:0.82rem;font-weight:600;
+  cursor:pointer;transition:background 0.2s;white-space:nowrap;flex-shrink:0;
+}
+.bottom-send:hover{background:var(--dark);}
+
+/* MODAL */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(44,26,14,0.5);
+  z-index:500;display:none;align-items:center;justify-content:center;padding:2rem;
+}
+.modal-bg.open{display:flex;}
+.modal-box{
+  background:var(--white);border-radius:24px;
+  border:1px solid var(--border2);padding:2rem;
+  max-width:480px;width:100%;
+  animation:mIn 0.25s ease;
+  position:relative;
+}
+@keyframes mIn{from{transform:scale(0.92);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-close{
+  position:absolute;top:1rem;right:1rem;
+  background:var(--sand2);border:none;border-radius:50%;
+  width:30px;height:30px;cursor:pointer;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;color:var(--text2);
+}
+.modal-title2{
+  font-family:'Playfair Display',serif;
+  font-size:1.3rem;font-weight:600;
+  margin-bottom:1.5rem;letter-spacing:-0.02em;
+}
+.rating-stars{display:flex;gap:8px;font-size:1.8rem;margin-bottom:1rem;cursor:pointer;}
+.success-modal{text-align:center;padding:1rem 0;}
+.success-icon{font-size:3.5rem;margin-bottom:1rem;}
+.success-title{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:600;margin-bottom:0.5rem;}
+.success-desc{font-size:0.85rem;color:var(--text3);line-height:1.6;}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--dark);color:var(--white);
+  padding:10px 20px;border-radius:100px;
+  font-size:0.82rem;font-weight:500;
+  z-index:1000;opacity:0;transition:all 0.3s;pointer-events:none;
+  white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* COLORS */
+.bg1{background:linear-gradient(135deg,#1565c0,#2196f3);}
+.bg2{background:linear-gradient(135deg,#0277bd,#0288d1);}
+.bg3{background:linear-gradient(135deg,#1a237e,#3949ab);}
+.bg4{background:linear-gradient(135deg,#006064,#00838f);}
+.bg5{background:linear-gradient(135deg,#01579b,#039be5);}
+.bg6{background:linear-gradient(135deg,#0d47a1,#1976d2);}
+
+.si1{background:rgba(21,101,192,0.10);}
+.si2{background:rgba(2,119,189,0.10);}
+.si3{background:rgba(26,35,126,0.10);}
+.si4{background:rgba(0,96,100,0.10);}
+
+/* RESPONSIVE */
+@media(max-width:1200px){
+  .sidebar-right{display:none;}
+  .bottom-bar{right:0;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:900px){
+  .sidebar-left{display:none;}
+  .bottom-bar{left:0;}
+  .nav-tabs{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ LOGIN PAGE ═══════════════════ -->
+<div class="auth-page active" id="loginPage">
+  <div class="auth-bg-text">SS</div>
+  <div class="auth-box">
+    <div class="auth-logo">Skill<span>Swap</span> <span style="font-size:0.6em;color:var(--text3);font-family:Inter;font-weight:400;">CSE</span></div>
+    <div class="auth-sub">Peer-to-Peer Technical Skill Exchange</div>
+    <div class="auth-title">Welcome back</div>
+    <div class="auth-desc">Sign in to continue your learning journey and connect with fellow engineers.</div>
+    <div class="form-field">
+      <label>College Email</label>
+      <input type="email" placeholder="yourname@college.edu" id="loginEmail">
+    </div>
+    <div class="form-field">
+      <label>Password</label>
+      <input type="password" placeholder="••••••••" id="loginPass">
+    </div>
+    <button class="btn-primary" onclick="goApp()">Sign In →</button>
+    <div class="auth-divider">or</div>
+    <div class="auth-switch">
+      New to SkillSwap CSE? <a onclick="showSignup()">Create an account</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ SIGNUP PAGE ═══════════════════ -->
+<div class="auth-page" id="signupPage">
+  <div class="auth-bg-text">SS</div>
+  <div class="auth-box">
+    <div class="auth-logo">Skill<span>Swap</span> <span style="font-size:0.6em;color:var(--text3);font-family:Inter;font-weight:400;">CSE</span></div>
+    <div class="auth-sub">DTI Innovation Project · 2025</div>
+    <div class="auth-title">Create your profile</div>
+    <div class="auth-desc">Set up your skill profile once, match with peers forever.</div>
+    <div class="form-row">
+      <div class="form-field">
+        <label>First Name</label>
+        <input type="text" placeholder="Arjun">
+      </div>
+      <div class="form-field">
+        <label>Last Name</label>
+        <input type="text" placeholder="Kumar">
+      </div>
+    </div>
+    <div class="form-field">
+      <label>College Email</label>
+      <input type="email" placeholder="yourname@college.edu">
+    </div>
+    <div class="form-row">
+      <div class="form-field">
+        <label>Branch</label>
+        <select>
+          <option>CSE</option>
+          <option>CSE - AI</option>
+          <option selected>CSE - AI/ML</option>
+          <option>CSE - DS</option>
+          <option>CSE - Cyber</option>
+          <option>CSE - IoT</option>
+          <option>CSE - Cloud</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Year</label>
+        <select>
+          <option>1st Year</option>
+          <option>2nd Year</option>
+          <option selected>3rd Year</option>
+          <option>4th Year</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-field">
+      <label>Password</label>
+      <input type="password" placeholder="••••••••">
+    </div>
+    <button class="btn-primary" onclick="goApp()">Create Account & Start Matching →</button>
+    <div class="auth-switch">Already have an account? <a onclick="showLogin()">Sign in</a></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MAIN APP ═══════════════════ -->
+<div class="app" id="mainApp">
+
+  <!-- TOP NAV -->
+  <nav class="topnav">
+    <div class="nav-brand">Skill<span>Swap</span> <span style="font-size:0.65rem;color:var(--text3);font-weight:400;font-family:Inter;">CSE</span></div>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="goPage('dashboard',this)">Dashboard</button>
+      <button class="nav-tab" onclick="goPage('find',this)">Find Matches</button>
+      <button class="nav-tab" onclick="goPage('sessions',this)">My Sessions</button>
+      <button class="nav-tab" onclick="goPage('leaderboard',this)">Leaderboard</button>
+      <button class="nav-tab" onclick="goPage('profile',this)">Profile</button>
+    </div>
+    <div class="nav-right">
+      <div class="credit-badge">
+        <div class="coin">✦</div>
+        <span id="creditCount">24</span> credits
+      </div>
+      <div class="nav-avatar" onclick="goPage('profile',null)">AK</div>
+    </div>
+  </nav>
+
+  <div class="main-content">
+
+    <!-- LEFT SIDEBAR -->
+    <div class="sidebar-left">
+      <!-- Chats -->
+      <div>
+        <div class="sidebar-section-label">💬 Active Chats</div>
+        <div class="chat-item active-chat">
+          <div class="chat-av bg2">SR</div>
+          <div class="chat-info">
+            <div class="chat-name">Sneha Reddy</div>
+            <div class="chat-preview">Can we do DSA session tmrw?</div>
+          </div>
+          <div class="chat-badge">2</div>
+        </div>
+        <div class="chat-item">
+          <div class="chat-av bg3">VP</div>
+          <div class="chat-info">
+            <div class="chat-name">Vikram Patel</div>
+            <div class="chat-preview">React hooks session done ✓</div>
+          </div>
+        </div>
+        <div class="chat-item">
+          <div class="chat-av bg4">DM</div>
+          <div class="chat-info">
+            <div class="chat-name">Divya Menon</div>
+            <div class="chat-preview">AWS Lambda resources sent</div>
+          </div>
+        </div>
+        <div class="chat-item">
+          <div class="chat-av bg5">RJ</div>
+          <div class="chat-info">
+            <div class="chat-name">Rohan Joshi</div>
+            <div class="chat-preview">NLP model training help?</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Sessions -->
+      <div>
+        <div class="sidebar-section-label">⚡ Active Sessions</div>
+        <div class="session-item">
+          <div class="session-skill">React Hooks Deep Dive</div>
+          <div class="session-meta">with Vikram Patel · Now</div>
+          <span class="session-status status-live">● LIVE</span>
+        </div>
+        <div class="session-item" style="margin-top:8px;">
+          <div class="session-skill">DSA — Graph Algorithms</div>
+          <div class="session-meta">with Sneha Reddy · Tomorrow 4 PM</div>
+          <span class="session-status status-soon">⏰ UPCOMING</span>
+        </div>
+        <div class="session-item" style="margin-top:8px;">
+          <div class="session-skill">Python Pandas Crash Course</div>
+          <div class="session-meta">with Priya Sharma · Fri 6 PM</div>
+          <span class="session-status status-soon">⏰ UPCOMING</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER PANEL -->
+    <div class="center-panel">
+
+      <!-- ── DASHBOARD PAGE ── -->
+      <div class="page active" id="page-dashboard">
+
+        <div class="greeting">
+          Good morning, <span>Arjun</span> 👋
+          <div class="greeting-sub">You have 2 sessions today. Keep the streak going!</div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon si1">🔥</div>
+            <div class="stat-num">12</div>
+            <div class="stat-label">Day Streak</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon si2">🤝</div>
+            <div class="stat-num">8</div>
+            <div class="stat-label">Exchanges Done</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon si3">⭐</div>
+            <div class="stat-num">4.8</div>
+            <div class="stat-label">Avg Rating</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon si4">✦</div>
+            <div class="stat-num">24</div>
+            <div class="stat-label">Credits Left</div>
+          </div>
+        </div>
+
+        <!-- STREAK -->
+        <div class="streak-bar">
+          <div class="streak-fire">🔥</div>
+          <div class="streak-info">
+            <div class="streak-title">12-Day Learning Streak!</div>
+            <div class="streak-desc">Complete a session today to keep it going</div>
+            <div class="streak-days">
+              <div class="streak-day done">M</div>
+              <div class="streak-day done">T</div>
+              <div class="streak-day done">W</div>
+              <div class="streak-day done">T</div>
+              <div class="streak-day done">F</div>
+              <div class="streak-day done">S</div>
+              <div class="streak-day today">S</div>
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--brown2);">12</div>
+            <div style="font-size:0.7rem;color:var(--text3);">days</div>
+          </div>
+        </div>
+
+        <!-- BEST MATCH -->
+        <div>
+          <div class="section-title">
+            ✨ Best Match For You Today
+            <a onclick="goPage('find',document.querySelectorAll('.nav-tab')[1])">See all matches</a>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;">
+
+            <div class="match-card">
+              <div class="match-header">
+                <div class="match-av bg2">SR</div>
+                <div>
+                  <div class="match-name">Sneha Reddy</div>
+                  <div class="match-branch">3rd Year · CSE-DS</div>
+                </div>
+                <div class="match-score-pill">94% match</div>
+              </div>
+              <div class="exchange-row">
+                <div class="ex-skill">
+                  <div class="ex-label">She Teaches</div>
+                  <div class="ex-name">DSA & Problem Solving</div>
+                  <span class="ex-level">Advanced</span>
+                </div>
+                <div class="ex-arrow">⇄</div>
+                <div class="ex-skill">
+                  <div class="ex-label">She Wants</div>
+                  <div class="ex-name">React & Frontend</div>
+                  <span class="ex-level">Beginner</span>
+                </div>
+              </div>
+              <div class="match-bars">
+                <div class="bar-row">
+                  <div class="bar-label">Skill match</div>
+                  <div class="bar-track"><div class="bar-fill" style="width:95%"></div></div>
+                  <div class="bar-pct">95%</div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-label">Level compat.</div>
+                  <div class="bar-track"><div class="bar-fill" style="width:85%"></div></div>
+                  <div class="bar-pct">85%</div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-label">Availability</div>
+                  <div class="bar-track"><div class="bar-fill" style="width:80%"></div></div>
+                  <div class="bar-pct">80%</div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-label">Rating</div>
+                  <div class="bar-track"><div class="bar-fill" style="width:92%"></div></div>
+                  <div class="bar-pct">4.6★</div>
+                </div>
+              </div>
+              <div class="match-actions">
+                <button class="btn-request" onclick="openRequestModal('Sneha Reddy')">Request Exchange</button>
+                <button class="btn-save">Save</button>
+              </div>
+            </div>
+
+            <div class="match-card">
+              <div class="match-header">
+                <div class="match-av bg3">VP</div>
+                <div>
+                  <div class="match-name">Vikram Patel</div>
+                  <div class="match-branch">4th Year · CSE</div>
+                </div>
+                <div class="match-score-pill">87% match</div>
+              </div>
+              <div class="exchange-row">
+                <div class="ex-skill">
+                  <div class="ex-label">He Teaches</div>
+                  <div class="ex-name">Node.js & Backend</div>
+                  <span class="ex-level">Advanced</span>
+                </div>
+                <div class="ex-arrow">⇄</div>
+                <div class="ex-skill">
+                  <div class="ex-label">He Wants</div>
+                  <div class="ex-name">Machine Learning</div>
+                  <span class="ex-level">Beginner</span>
+                </div>
+              </div>
+              <div class="match-bars">
+                <div class="bar-row">
+                  <div class="bar-label">Skill match</div>
+                  <div class="bar-track"><div class="bar-fill" style="width:88%"></div></div>
+                  <div class="bar-pct">88%</div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-label">Level compat.</div>
+                  <div class="bar-track"><div class="bar-fill" style="width:75%"></div></div>
+                  <div class="bar-pct">75%</div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-label">Availability</div>
+                  <div class="bar-track"><div class="bar-fill" style="width:90%"></div></div>
+                  <div class="bar-pct">90%</div>
+                </div>
+                <div class="bar-row">
+                  <div class="bar-label">Rating</div>
+                  <div class="bar-track"><div class="bar-fill" style="width:96%"></div></div>
+                  <div class="bar-pct">4.8★</div>
+                </div>
+              </div>
+              <div class="match-actions">
+                <button class="btn-request" onclick="openRequestModal('Vikram Patel')">Request Exchange</button>
+                <button class="btn-save">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SESSION FEED -->
+        <div>
+          <div class="section-title">📡 Live Feed — Sessions Happening Now</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:1rem 1.25rem;display:flex;align-items:center;gap:12px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#4a9a5a;animation:pulse2 2s infinite;flex-shrink:0;"></div>
+              <span style="font-size:0.82rem;"><strong>Priya S.</strong> is teaching <strong>Scikit-learn</strong> to Karan M. · Started 20 min ago</span>
+              <span style="margin-left:auto;font-size:0.72rem;color:var(--text3);">DSA</span>
+            </div>
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:1rem 1.25rem;display:flex;align-items:center;gap:12px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#4a9a5a;animation:pulse2 2s infinite 0.5s;flex-shrink:0;"></div>
+              <span style="font-size:0.82rem;"><strong>Rahul T.</strong> is teaching <strong>Docker & Kubernetes</strong> to Ananya V. · Started 5 min ago</span>
+              <span style="margin-left:auto;font-size:0.72rem;color:var(--text3);">Cloud</span>
+            </div>
+            <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:1rem 1.25rem;display:flex;align-items:center;gap:12px;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#4a9a5a;animation:pulse2 2s infinite 1s;flex-shrink:0;"></div>
+              <span style="font-size:0.82rem;"><strong>Meera K.</strong> is teaching <strong>Flutter basics</strong> to Dev P. · Started 42 min ago</span>
+              <span style="margin-left:auto;font-size:0.72rem;color:var(--text3);">App Dev</span>
+            </div>
+          </div>
+        </div>
+        <style>
+        @keyframes pulse2{0%,100%{opacity:1}50%{opacity:0.3}}
+        </style>
+      </div>
+
+      <!-- ── FIND MATCHES PAGE ── -->
+      <div class="page" id="page-find">
+        <div class="greeting">Find Your Match <div class="greeting-sub">Browse and filter by skill domain, level, or availability.</div></div>
+
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input type="text" placeholder="Search by skill, name, or branch...">
+        </div>
+
+        <div class="filter-chips">
+          <button class="fchip on" onclick="toggleFilter(this)">All Domains</button>
+          <button class="fchip" onclick="toggleFilter(this)">DSA</button>
+          <button class="fchip" onclick="toggleFilter(this)">Web Dev</button>
+          <button class="fchip" onclick="toggleFilter(this)">AI / ML</button>
+          <button class="fchip" onclick="toggleFilter(this)">App Dev</button>
+          <button class="fchip" onclick="toggleFilter(this)">Cloud / DevOps</button>
+          <button class="fchip" onclick="toggleFilter(this)">Java</button>
+          <button class="fchip" onclick="toggleFilter(this)">Python</button>
+          <button class="fchip" onclick="toggleFilter(this)">C++</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:240px 1fr;gap:1.5rem;align-items:start;">
+          <!-- Skill Tree -->
+          <div class="skill-tree">
+            <div class="tree-title">📂 Skill Taxonomy</div>
+            <div class="tree-domain open">
+              <div class="tree-domain-name" onclick="toggleTree(this.parentElement)">Web Development</div>
+              <div class="tree-sub">
+                <div style="font-size:0.72rem;color:var(--text3);margin-bottom:4px;font-weight:600;">Frontend</div>
+                <span class="tree-leaf sel">React</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">HTML/CSS</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">Vue.js</span>
+                <div style="font-size:0.72rem;color:var(--text3);margin:6px 0 4px;font-weight:600;">Backend</div>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">Node.js</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">Django</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">FastAPI</span>
+              </div>
+            </div>
+            <div class="tree-domain">
+              <div class="tree-domain-name" onclick="toggleTree(this.parentElement)">DSA</div>
+              <div class="tree-sub">
+                <span class="tree-leaf" onclick="toggleLeaf(this)">Arrays</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">Graphs</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">DP</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">Trees</span>
+              </div>
+            </div>
+            <div class="tree-domain">
+              <div class="tree-domain-name" onclick="toggleTree(this.parentElement)">AI / ML</div>
+              <div class="tree-sub">
+                <span class="tree-leaf" onclick="toggleLeaf(this)">Scikit-learn</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">TensorFlow</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">PyTorch</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">NLP</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">Computer Vision</span>
+              </div>
+            </div>
+            <div class="tree-domain">
+              <div class="tree-domain-name" onclick="toggleTree(this.parentElement)">App Dev</div>
+              <div class="tree-sub">
+                <span class="tree-leaf" onclick="toggleLeaf(this)">Flutter</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">Android (Kotlin)</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">React Native</span>
+              </div>
+            </div>
+            <div class="tree-domain">
+              <div class="tree-domain-name" onclick="toggleTree(this.parentElement)">Cloud / DevOps</div>
+              <div class="tree-sub">
+                <span class="tree-leaf" onclick="toggleLeaf(this)">AWS</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">Docker</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">Kubernetes</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">CI/CD</span>
+              </div>
+            </div>
+            <div class="tree-domain">
+              <div class="tree-domain-name" onclick="toggleTree(this.parentElement)">Languages</div>
+              <div class="tree-sub">
+                <span class="tree-leaf" onclick="toggleLeaf(this)">Python</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">Java</span>
+                <span class="tree-leaf" onclick="toggleLeaf(this)">C++</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Match Cards -->
+          <div class="matches-grid">
+            <div class="match-card">
+              <div class="match-header">
+                <div class="match-av bg2">SR</div>
+                <div><div class="match-name">Sneha Reddy</div><div class="match-branch">3rd Yr · CSE-DS</div></div>
+                <div class="match-score-pill">94%</div>
+              </div>
+              <div class="exchange-row">
+                <div class="ex-skill"><div class="ex-label">Teaches</div><div class="ex-name">DSA</div><span class="ex-level">Advanced</span></div>
+                <div class="ex-arrow">⇄</div>
+                <div class="ex-skill"><div class="ex-label">Wants</div><div class="ex-name">React</div><span class="ex-level">Beginner</span></div>
+              </div>
+              <div class="match-actions">
+                <button class="btn-request" onclick="openRequestModal('Sneha Reddy')">Request</button>
+                <button class="btn-save">💾</button>
+              </div>
+            </div>
+            <div class="match-card">
+              <div class="match-header">
+                <div class="match-av bg4">PS</div>
+                <div><div class="match-name">Priya Sharma</div><div class="match-branch">4th Yr · CSE-AI</div></div>
+                <div class="match-score-pill">91%</div>
+              </div>
+              <div class="exchange-row">
+                <div class="ex-skill"><div class="ex-label">Teaches</div><div class="ex-name">ML & PyTorch</div><span class="ex-level">Advanced</span></div>
+                <div class="ex-arrow">⇄</div>
+                <div class="ex-skill"><div class="ex-label">Wants</div><div class="ex-name">React</div><span class="ex-level">Intermediate</span></div>
+              </div>
+              <div class="match-actions">
+                <button class="btn-request" onclick="openRequestModal('Priya Sharma')">Request</button>
+                <button class="btn-save">💾</button>
+              </div>
+            </div>
+            <div class="match-card">
+              <div class="match-header">
+                <div class="match-av bg6">KR</div>
+                <div><div class="match-name">Karthik Rao</div><div class="match-branch">3rd Yr · CSE-Cloud</div></div>
+                <div class="match-score-pill">88%</div>
+              </div>
+              <div class="exchange-row">
+                <div class="ex-skill"><div class="ex-label">Teaches</div><div class="ex-name">AWS & Docker</div><span class="ex-level">Intermediate</span></div>
+                <div class="ex-arrow">⇄</div>
+                <div class="ex-skill"><div class="ex-label">Wants</div><div class="ex-name">Node.js</div><span class="ex-level">Beginner</span></div>
+              </div>
+              <div class="match-actions">
+                <button class="btn-request" onclick="openRequestModal('Karthik Rao')">Request</button>
+                <button class="btn-save">💾</button>
+              </div>
+            </div>
+            <div class="match-card">
+              <div class="match-header">
+                <div class="match-av bg5">AV</div>
+                <div><div class="match-name">Ananya Verma</div><div class="match-branch">2nd Yr · CSE-DS</div></div>
+                <div class="match-score-pill">83%</div>
+              </div>
+              <div class="exchange-row">
+                <div class="ex-skill"><div class="ex-label">Teaches</div><div class="ex-name">Python & Pandas</div><span class="ex-level">Intermediate</span></div>
+                <div class="ex-arrow">⇄</div>
+                <div class="ex-skill"><div class="ex-label">Wants</div><div class="ex-name">Flutter</div><span class="ex-level">Beginner</span></div>
+              </div>
+              <div class="match-actions">
+                <button class="btn-request" onclick="openRequestModal('Ananya Verma')">Request</button>
+                <button class="btn-save">💾</button>
+              </div>
+            </div>
+            <div class="match-card">
+              <div class="match-header">
+                <div class="match-av bg1">RJ</div>
+                <div><div class="match-name">Rohan Joshi</div><div class="match-branch">3rd Yr · CSE-AI</div></div>
+                <div class="match-score-pill">79%</div>
+              </div>
+              <div class="exchange-row">
+                <div class="ex-skill"><div class="ex-label">Teaches</div><div class="ex-name">NLP & BERT</div><span class="ex-level">Intermediate</span></div>
+                <div class="ex-arrow">⇄</div>
+                <div class="ex-skill"><div class="ex-label">Wants</div><div class="ex-name">Android Dev</div><span class="ex-level">Beginner</span></div>
+              </div>
+              <div class="match-actions">
+                <button class="btn-request" onclick="openRequestModal('Rohan Joshi')">Request</button>
+                <button class="btn-save">💾</button>
+              </div>
+            </div>
+            <div class="match-card">
+              <div class="match-header">
+                <div class="match-av bg3">NK</div>
+                <div><div class="match-name">Nikhil Kiran</div><div class="match-branch">4th Yr · CSE</div></div>
+                <div class="match-score-pill">76%</div>
+              </div>
+              <div class="exchange-row">
+                <div class="ex-skill"><div class="ex-label">Teaches</div><div class="ex-name">Java & Spring</div><span class="ex-level">Advanced</span></div>
+                <div class="ex-arrow">⇄</div>
+                <div class="ex-skill"><div class="ex-label">Wants</div><div class="ex-name">Data Science</div><span class="ex-level">Beginner</span></div>
+              </div>
+              <div class="match-actions">
+                <button class="btn-request" onclick="openRequestModal('Nikhil Kiran')">Request</button>
+                <button class="btn-save">💾</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SESSIONS PAGE ── -->
+      <div class="page" id="page-sessions">
+        <div class="greeting">My Sessions <div class="greeting-sub">Track your exchange history and upcoming sessions.</div></div>
+
+        <div class="session-tabs">
+          <button class="stab on" onclick="toggleStab(this)">Upcoming</button>
+          <button class="stab" onclick="toggleStab(this)">Completed</button>
+          <button class="stab" onclick="toggleStab(this)">Requested</button>
+        </div>
+
+        <!-- Session flow indicator -->
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:1.25rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;overflow-x:auto;">
+          <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--brown1);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;">1</div>
+            <span style="font-size:0.78rem;font-weight:600;color:var(--brown1);">Request</span>
+          </div>
+          <div style="flex:1;height:2px;background:var(--brown3);min-width:20px;"></div>
+          <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--brown2);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;">2</div>
+            <span style="font-size:0.78rem;font-weight:600;color:var(--brown2);">Accept</span>
+          </div>
+          <div style="flex:1;height:2px;background:var(--brown4);min-width:20px;"></div>
+          <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--brown3);color:var(--white);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;">3</div>
+            <span style="font-size:0.78rem;font-weight:600;color:var(--brown3);">Schedule</span>
+          </div>
+          <div style="flex:1;height:2px;background:var(--brown5);min-width:20px;"></div>
+          <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--sand3);color:var(--brown2);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;">4</div>
+            <span style="font-size:0.78rem;font-weight:600;color:var(--text3);">Session</span>
+          </div>
+          <div style="flex:1;height:2px;background:var(--border2);min-width:20px;"></div>
+          <div style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:50%;background:var(--sand2);color:var(--text3);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;">5</div>
+            <span style="font-size:0.78rem;font-weight:600;color:var(--text3);">Feedback</span>
+          </div>
+        </div>
+
+        <div class="session-card">
+          <div class="session-date"><div class="session-day">14</div><div class="session-mon">Apr</div></div>
+          <div class="session-details">
+            <div class="session-title2">React Hooks & Context API</div>
+            <div class="session-with">with Vikram Patel · You teach him ML in return</div>
+            <div class="session-time">⏰ Today, 4:00 PM – 5:00 PM · Google Meet</div>
+          </div>
+          <div class="session-cta">
+            <button class="btn-sm primary" onclick="showToast('Joining session...')">Join Now</button>
+            <button class="btn-sm">Reschedule</button>
+          </div>
+        </div>
+        <div class="session-card">
+          <div class="session-date"><div class="session-day">16</div><div class="session-mon">Apr</div></div>
+          <div class="session-details">
+            <div class="session-title2">DSA — Graph Algorithms</div>
+            <div class="session-with">with Sneha Reddy · She teaches you, you teach React</div>
+            <div class="session-time">⏰ Wed, 6:00 PM – 7:00 PM · Discord</div>
+          </div>
+          <div class="session-cta">
+            <button class="btn-sm primary" onclick="showToast('Opening Discord...')">Join</button>
+            <button class="btn-sm">Reschedule</button>
+          </div>
+        </div>
+        <div class="session-card">
+          <div class="session-date"><div class="session-day">18</div><div class="session-mon">Apr</div></div>
+          <div class="session-details">
+            <div class="session-title2">AWS Lambda & Serverless</div>
+            <div class="session-with">with Divya Menon · Credit exchange (–5 credits)</div>
+            <div class="session-time">⏰ Fri, 5:30 PM – 6:30 PM · Zoom</div>
+          </div>
+          <div class="session-cta">
+            <button class="btn-sm">Details</button>
+            <button class="btn-sm" onclick="showToast('Session cancelled')">Cancel</button>
+          </div>
+        </div>
+        <div class="session-card" style="opacity:0.65;">
+          <div class="session-date" style="background:var(--sand3);"><div class="session-day">10</div><div class="session-mon">Apr</div></div>
+          <div class="session-details">
+            <div class="session-title2">Python for ML — Completed ✓</div>
+            <div class="session-with">with Priya Sharma · 5 credits earned</div>
+            <div class="session-time">⭐⭐⭐⭐⭐ You rated this 5/5</div>
+          </div>
+          <div class="session-cta">
+            <button class="btn-sm" onclick="openRateModal()">View Feedback</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── LEADERBOARD PAGE ── -->
+      <div class="page" id="page-leaderboard">
+        <div class="greeting">Leaderboard <div class="greeting-sub">Top mentors and most active learners this month.</div></div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem;">
+          <div style="background:linear-gradient(135deg,#1565c0,#2196f3);border-radius:20px;padding:1.5rem;color:var(--white);">
+            <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;opacity:0.7;margin-bottom:0.75rem;">🏆 Top Mentor</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,254,251,0.2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;">PS</div>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;">Priya Sharma</div>
+                <div style="font-size:0.75rem;opacity:0.7;">32 sessions · ⭐ 4.9</div>
+              </div>
+            </div>
+          </div>
+          <div style="background:linear-gradient(135deg,#006064,#00838f);border-radius:20px;padding:1.5rem;color:var(--white);">
+            <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;opacity:0.7;margin-bottom:0.75rem;">📚 Most Active Learner</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,254,251,0.2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.1rem;">AK</div>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;">Arjun Kumar</div>
+                <div style="font-size:0.75rem;opacity:0.7;">18 sessions · 12-day streak</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="leaderboard-table">
+          <div class="lb-header">
+            <div>#</div>
+            <div>Student</div>
+            <div>Sessions</div>
+            <div>Credits</div>
+            <div>Rating</div>
+          </div>
+          <div class="lb-row">
+            <div class="lb-rank gold">1</div>
+            <div class="lb-user"><div class="lb-av bg4">PS</div><div><div class="lb-name">Priya Sharma</div><div class="lb-branch">CSE-AI · 4th Yr</div></div></div>
+            <div class="lb-stat">32</div>
+            <div class="lb-stat">148</div>
+            <div><div class="stars">★★★★★</div><div style="font-size:0.7rem;color:var(--text3);">4.9</div></div>
+          </div>
+          <div class="lb-row">
+            <div class="lb-rank silver">2</div>
+            <div class="lb-user"><div class="lb-av bg6">NK</div><div><div class="lb-name">Nikhil Kiran</div><div class="lb-branch">CSE · 4th Yr</div></div></div>
+            <div class="lb-stat">28</div>
+            <div class="lb-stat">132</div>
+            <div><div class="stars">★★★★★</div><div style="font-size:0.7rem;color:var(--text3);">4.8</div></div>
+          </div>
+          <div class="lb-row">
+            <div class="lb-rank bronze">3</div>
+            <div class="lb-user"><div class="lb-av bg3">VP</div><div><div class="lb-name">Vikram Patel</div><div class="lb-branch">CSE · 4th Yr</div></div></div>
+            <div class="lb-stat">25</div>
+            <div class="lb-stat">118</div>
+            <div><div class="stars">★★★★★</div><div style="font-size:0.7rem;color:var(--text3);">4.8</div></div>
+          </div>
+          <div class="lb-row" style="background:rgba(107,76,42,0.04);">
+            <div class="lb-rank">4</div>
+            <div class="lb-user"><div class="lb-av bg1" style="border:2px solid var(--brown2);">AK</div><div><div class="lb-name">Arjun Kumar <span style="font-size:0.68rem;color:var(--brown2);">(You)</span></div><div class="lb-branch">CSE-AI/ML · 3rd Yr</div></div></div>
+            <div class="lb-stat">18</div>
+            <div class="lb-stat">24</div>
+            <div><div class="stars">★★★★★</div><div style="font-size:0.7rem;color:var(--text3);">4.8</div></div>
+          </div>
+          <div class="lb-row">
+            <div class="lb-rank">5</div>
+            <div class="lb-user"><div class="lb-av bg2">SR</div><div><div class="lb-name">Sneha Reddy</div><div class="lb-branch">CSE-DS · 3rd Yr</div></div></div>
+            <div class="lb-stat">16</div>
+            <div class="lb-stat">88</div>
+            <div><div class="stars">★★★★☆</div><div style="font-size:0.7rem;color:var(--text3);">4.6</div></div>
+          </div>
+          <div class="lb-row">
+            <div class="lb-rank">6</div>
+            <div class="lb-user"><div class="lb-av bg5">KR</div><div><div class="lb-name">Karthik Rao</div><div class="lb-branch">CSE-Cloud · 3rd Yr</div></div></div>
+            <div class="lb-stat">14</div>
+            <div class="lb-stat">74</div>
+            <div><div class="stars">★★★★☆</div><div style="font-size:0.7rem;color:var(--text3);">4.5</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROFILE PAGE ── -->
+      <div class="page" id="page-profile">
+        <div class="profile-hero">
+          <div class="profile-av-lg">AK</div>
+          <div style="flex:1;">
+            <div class="profile-name">Arjun Kumar</div>
+            <div class="profile-branch-badge">🎓 CSE - AI/ML · 3rd Year</div>
+            <div class="profile-bio">Passionate about neural networks and building intelligent systems. Love teaching PyTorch and learning from peers in web development.</div>
+            <div class="profile-stats">
+              <div class="ps"><div class="ps-num">8</div><div class="ps-label">Exchanges</div></div>
+              <div class="ps"><div class="ps-num">4.8</div><div class="ps-label">Rating</div></div>
+              <div class="ps"><div class="ps-num">24</div><div class="ps-label">Credits</div></div>
+              <div class="ps"><div class="ps-num">12</div><div class="ps-label">Streak</div></div>
+            </div>
+          </div>
+          <button class="edit-btn" onclick="showToast('Edit mode coming soon!')">✏️ Edit Profile</button>
+        </div>
+
+        <!-- GitHub Proof -->
+        <div style="background:var(--white);border-radius:16px;border:1px solid var(--border);padding:1.25rem 1.5rem;margin-bottom:1rem;display:flex;align-items:center;gap:1rem;">
+          <span style="font-size:1.5rem;">🔗</span>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:0.88rem;">GitHub Connected</div>
+            <div style="font-size:0.75rem;color:var(--text3);">github.com/arjunkumar · 24 repos verified</div>
+          </div>
+          <span style="background:rgba(61,90,62,0.1);color:#3d5a3e;padding:4px 12px;border-radius:100px;font-size:0.72rem;font-weight:700;">✓ Verified</span>
+        </div>
+
+        <div class="skill-section">
+          <div class="skill-section-title">💡 Skills I Offer</div>
+          <div class="skill-pills">
+            <div class="skill-pill">PyTorch <span class="pill-level">Advanced</span></div>
+            <div class="skill-pill">TensorFlow <span class="pill-level">Intermediate</span></div>
+            <div class="skill-pill">Python <span class="pill-level">Advanced</span></div>
+            <div class="skill-pill">ML Algorithms <span class="pill-level">Advanced</span></div>
+            <div class="skill-pill">NLP <span class="pill-level">Intermediate</span></div>
+            <button class="add-skill-btn" onclick="showToast('Add skill feature coming soon!')">+ Add Skill</button>
+          </div>
+        </div>
+
+        <div class="skill-section">
+          <div class="skill-section-title">📚 Skills I Want to Learn</div>
+          <div class="skill-pills">
+            <div class="skill-pill">React <span class="pill-level" style="background:var(--brown4);">Beginner</span></div>
+            <div class="skill-pill">Node.js <span class="pill-level" style="background:var(--brown4);">Beginner</span></div>
+            <div class="skill-pill">Docker <span class="pill-level" style="background:var(--brown4);">Beginner</span></div>
+            <button class="add-skill-btn" onclick="showToast('Add skill feature coming soon!')">+ Add</button>
+          </div>
+        </div>
+
+        <div class="skill-section">
+          <div class="skill-section-title">⏰ Availability</div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;">
+            <div style="text-align:center;">
+              <div style="font-size:0.65rem;color:var(--text3);margin-bottom:4px;font-weight:700;">MON</div>
+              <div style="background:var(--brown1);color:var(--white);border-radius:8px;padding:6px 4px;font-size:0.7rem;font-weight:600;">4–8PM</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:0.65rem;color:var(--text3);margin-bottom:4px;font-weight:700;">TUE</div>
+              <div style="background:var(--sand2);border:1px solid var(--border2);border-radius:8px;padding:6px 4px;font-size:0.7rem;color:var(--text3);">–</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:0.65rem;color:var(--text3);margin-bottom:4px;font-weight:700;">WED</div>
+              <div style="background:var(--brown1);color:var(--white);border-radius:8px;padding:6px 4px;font-size:0.7rem;font-weight:600;">5–9PM</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:0.65rem;color:var(--text3);margin-bottom:4px;font-weight:700;">THU</div>
+              <div style="background:var(--sand2);border:1px solid var(--border2);border-radius:8px;padding:6px 4px;font-size:0.7rem;color:var(--text3);">–</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:0.65rem;color:var(--text3);margin-bottom:4px;font-weight:700;">FRI</div>
+              <div style="background:var(--brown2);color:var(--white);border-radius:8px;padding:6px 4px;font-size:0.7rem;font-weight:600;">6–9PM</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:0.65rem;color:var(--text3);margin-bottom:4px;font-weight:700;">SAT</div>
+              <div style="background:var(--brown1);color:var(--white);border-radius:8px;padding:6px 4px;font-size:0.7rem;font-weight:600;">All day</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="font-size:0.65rem;color:var(--text3);margin-bottom:4px;font-weight:700;">SUN</div>
+              <div style="background:var(--brown2);color:var(--white);border-radius:8px;padding:6px 4px;font-size:0.7rem;font-weight:600;">2–8PM</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end center-panel -->
+
+    <!-- RIGHT SIDEBAR -->
+    <div class="sidebar-right">
+      <!-- Profile Mini -->
+      <div class="profile-mini">
+        <div class="profile-mini-av">AK</div>
+        <div class="profile-mini-name">Arjun Kumar</div>
+        <div class="profile-mini-branch">CSE - AI/ML · 3rd Year</div>
+        <div class="credits-display">
+          <div>
+            <div class="credits-num" id="creditDisplay">24</div>
+            <div class="credits-label">credits available</div>
+          </div>
+          <div class="credits-icon">✦</div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <div class="qa-title">Quick Actions</div>
+        <button class="qa-btn" onclick="openRequestModal('a peer')">🤝 Request Session</button>
+        <button class="qa-btn" onclick="showToast('30-min micro slot booked!')">⚡ Book Micro-Session (30 min)</button>
+        <button class="qa-btn" onclick="openRateModal()">⭐ Rate Last Session</button>
+        <button class="qa-btn" onclick="showToast('Quiz started!')">🧠 Verify a Skill (Quiz)</button>
+      </div>
+
+      <!-- Top Mentors -->
+      <div class="top-mentors-mini">
+        <div class="tm-title">🏆 Top Mentors</div>
+        <div class="tm-row">
+          <div class="tm-av bg4">PS</div>
+          <div class="tm-info"><div class="tm-name">snehitha</div><div class="tm-skill">ML & PyTorch</div></div>
+          <div class="tm-rating">★ 4.9</div>
+        </div>
+        <div class="tm-row">
+          <div class="tm-av bg6">NK</div>
+          <div class="tm-info"><div class="tm-name">Nikhil Kiran</div><div class="tm-skill">Java & Spring</div></div>
+          <div class="tm-rating">★ 4.8</div>
+        </div>
+        <div class="tm-row">
+          <div class="tm-av bg3">VP</div>
+          <div class="tm-info"><div class="tm-name">Vikram Patel</div><div class="tm-skill">Full-Stack</div></div>
+          <div class="tm-rating">★ 4.8</div>
+        </div>
+        <div class="tm-row">
+          <div class="tm-av bg2">SR</div>
+          <div class="tm-info"><div class="tm-name">Sneha Reddy</div><div class="tm-skill">DSA</div></div>
+          <div class="tm-rating">★ 4.6</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end main-content -->
+
+  <!-- BOTTOM INPUT BAR -->
+  <div class="bottom-bar">
+    <div class="bottom-icon-btn" title="Voice input">🎤</div>
+    <input class="bottom-input" type="text" placeholder="Search skills, message a peer, or request a session..." id="bottomInput">
+    <button class="bottom-send" onclick="handleBottomSend()">Request Session →</button>
+  </div>
+  <div style="height:68px;"></div><!-- spacer for bottom bar -->
+
+</div><!-- end app -->
+
+<!-- ── REQUEST MODAL ── -->
+<div class="modal-bg" id="requestModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('requestModal')">✕</button>
+    <div class="modal-title2" id="modalTitle">Request Exchange</div>
+    <div class="form-field">
+      <label>Skill you'll teach</label>
+      <select id="m-teach">
+        <option>PyTorch & Deep Learning</option>
+        <option>TensorFlow</option>
+        <option>Python for ML</option>
+        <option>NLP Fundamentals</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>Skill you want to learn</label>
+      <select id="m-learn">
+        <option>React & Hooks</option>
+        <option>Node.js & Express</option>
+        <option>DSA Problem Solving</option>
+        <option>Docker & AWS</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>Exchange Type</label>
+      <select>
+        <option>Direct Swap (1:1)</option>
+        <option>Credit Based (spend credits)</option>
+        <option>Micro-Session (30 min)</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>Preferred Time Slots</label>
+      <select>
+        <option>Weekday Evenings (4–8 PM)</option>
+        <option>Weekend Afternoons</option>
+        <option>Flexible / Anytime</option>
+      </select>
+    </div>
+    <div class="form-field">
+      <label>Message (optional)</label>
+      <input type="text" placeholder="Hi! I'd love to swap React for PyTorch sessions..." style="font-family:Inter;font-size:0.9rem;">
+    </div>
+    <button class="btn-primary" onclick="sendRequest()">Send Exchange Request →</button>
+  </div>
+</div>
+
+<!-- ── RATING MODAL ── -->
+<div class="modal-bg" id="rateModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('rateModal')">✕</button>
+    <div class="modal-title2">Rate Your Session</div>
+    <div style="font-size:0.85rem;color:var(--text3);margin-bottom:1rem;">Python for ML with Priya Sharma</div>
+    <div class="rating-stars" id="ratingStars">
+      <span onclick="setRating(1)">☆</span>
+      <span onclick="setRating(2)">☆</span>
+      <span onclick="setRating(3)">☆</span>
+      <span onclick="setRating(4)">☆</span>
+      <span onclick="setRating(5)">☆</span>
+    </div>
+    <div class="form-field">
+      <label>What did you learn?</label>
+      <input type="text" placeholder="Pandas, EDA techniques, seaborn visualizations...">
+    </div>
+    <div class="form-field">
+      <label>Feedback for your peer</label>
+      <input type="text" placeholder="Great session! Very clear explanations...">
+    </div>
+    <button class="btn-primary" onclick="submitRating()">Submit Feedback & Credits →</button>
+  </div>
+</div>
+
+<!-- ── SUCCESS MODAL ── -->
+<div class="modal-bg" id="successModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('successModal')">✕</button>
+    <div class="success-modal">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Request Sent!</div>
+      <div class="success-desc">Your exchange request has been sent. You'll get notified when they accept. Happy learning!</div>
+      <div style="background:var(--sand2);border-radius:12px;padding:1rem;margin-top:1rem;font-size:0.82rem;color:var(--brown2);font-weight:500;">
+        ✦ Matching score will update once they confirm their availability.
+      </div>
+      <button class="btn-primary" style="margin-top:1.25rem;" onclick="closeModal('successModal')">Got it</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── AUTH ──
+function showSignup(){ document.getElementById('loginPage').classList.remove('active'); document.getElementById('signupPage').classList.add('active'); }
+function showLogin(){ document.getElementById('signupPage').classList.remove('active'); document.getElementById('loginPage').classList.add('active'); }
+function goApp(){ document.getElementById('loginPage').classList.remove('active'); document.getElementById('signupPage').classList.remove('active'); document.getElementById('mainApp').classList.add('active'); }
+
+// ── NAV ──
+function goPage(id, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(btn){ document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active')); btn.classList.add('active'); }
+}
+
+// ── FILTER ──
+function toggleFilter(el){
+  document.querySelectorAll('.fchip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+// ── SKILL TREE ──
+function toggleTree(el){ el.classList.toggle('open'); }
+function toggleLeaf(el){ el.classList.toggle('sel'); }
+
+// ── SESSION TABS ──
+function toggleStab(el){ document.querySelectorAll('.stab').forEach(t=>t.classList.remove('on')); el.classList.add('on'); }
+
+// ── MODAL ──
+function openRequestModal(name){
+  document.getElementById('modalTitle').textContent = 'Request Exchange with ' + name;
+  document.getElementById('requestModal').classList.add('open');
+}
+function openRateModal(){ document.getElementById('rateModal').classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-bg').forEach(m=>{ m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); }); });
+
+function sendRequest(){
+  closeModal('requestModal');
+  setTimeout(()=>document.getElementById('successModal').classList.add('open'),200);
+}
+
+// ── RATING ──
+function setRating(n){
+  const stars = document.querySelectorAll('#ratingStars span');
+  stars.forEach((s,i)=>{ s.textContent = i<n ? '★' : '☆'; s.style.color = i<n ? 'var(--brown3)' : ''; });
+}
+function submitRating(){
+  closeModal('rateModal');
+  let c = parseInt(document.getElementById('creditCount').textContent);
+  document.getElementById('creditCount').textContent = c+5;
+  document.getElementById('creditDisplay').textContent = c+5;
+  showToast('✓ Feedback submitted! +5 credits earned');
+}
+
+// ── BOTTOM BAR ──
+function handleBottomSend(){
+  const v = document.getElementById('bottomInput').value.trim();
+  if(v){ showToast('Searching for: '+v); document.getElementById('bottomInput').value=''; }
+  else openRequestModal('a peer');
+}
+
+// ── TOAST ──
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// Enter key on bottom input
+document.getElementById('bottomInput').addEventListener('keydown',e=>{ if(e.key==='Enter') handleBottomSend(); });
+</script>
+
+</body>
+</html>
